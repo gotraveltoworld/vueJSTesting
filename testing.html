@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Vue component testing</title>
+  </head>
+  <body>
+    <div id="app">
+      <button v-on:click="callFun">A</button>
+      <button v-on:click="callFun">B</button>
+      <br>
+      <child>{{msg}}</child>
+      <br>
+      <my-child :msg="msg"></my-child>
+    </div>
+    <script src="./js/vue.min.js"></script>
+  </body>
+  <script>
+    Vue.component('my-child', {
+      props: ['msg'],
+      template: "<input type='text' value='Msg: ({{ msg }})'>"
+    });
+    var vm = new Vue({
+      el: '#app',
+      data: { msg : ''},
+      methods: {
+        callFun : function() {
+          this.msg = "Hello " + event.target.innerText + " !!";
+        }
+      }
+    });
+  </script>
+</html>
