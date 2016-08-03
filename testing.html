@@ -1,30 +1,52 @@
+<!--
+    運用vueJS實作'component(此處稱為組件)'.
+    主要功能為按下A或是B時，下方元素相對應顯示該按鈕的文字內容.
+    目前此網頁展示部分包含兩部分：
+     1. 直接顯示文字以及將資訊傳遞至組件處理.
+     2. 透過"props"接收資訊後修改模板內容.
+-->
 <html>
   <head>
     <title>Vue component testing</title>
   </head>
   <body>
+    <!-- root element -->
     <div id="app">
+      <!-- button A -->
       <button v-on:click="callFun">A</button>
+      <!-- button B -->
       <button v-on:click="callFun">B</button>
       <br>
+      <!-- text information from button A or button B -->
       <child>{{msg}}</child>
       <br>
+      <!-- Use component to set message -->
       <my-child :msg="msg"></my-child>
     </div>
+    <!-- Load vueJs library -->
     <script src="./js/vue.min.js"></script>
   </body>
   <script>
+    //宣告並設定組件模板內容
     Vue.component('my-child', {
+      //接收的資訊
       props: ['msg'],
+      //模板內容
       template: "<input type='text' value='Msg: ({{ msg }})'>"
     });
+    //宣告Vue實例
     var vm = new Vue({
+      //指定該元素的id
       el: '#app',
+      //指定資料
       data: { msg : ''},
+      //指定方法
       methods: {
+        //按下按鈕會執行該函式
         callFun : function() {
+          //利用"event"獲取該按鈕的內部參數
           this.msg = "Hello " + event.target.innerText + " !!";
-        }
+        }//end of callFun()
       }
     });
   </script>
