@@ -1,53 +1,68 @@
 <!--
-    運用vueJS實作'component(此處稱為組件)'.
-    主要功能為按下按鈕A或是按鈕B時，下方元素相對應顯示該按鈕的文字內容.
-    目前此網頁展示部分包含兩部分：
-     1. 直接顯示文字以及將資訊傳遞至組件處理.
-     2. 透過"props"接收資訊後修改模板內容.
+    利用VueJs組件功能測試非同步更新DOM資料,
+    此處利用官方範例修改而成。
+    包含創建組件(行:26-49)、創建Vue實例(行:50-62)、Vue子組件的函式呼叫方式(行:59)。
+
+    相關內容請參照：https://vuejs.org.cn/guide/reactivity.html#异步更新队列
+
+    測試方式請於開啟時利用console查閱msg變化。
 -->
+<!DOCTYPE html>
 <html>
+  <title>Web Page Design</title>
   <head>
-    <title>Vue component testing</title>
   </head>
   <body>
-    <!-- root element -->
-    <div id="app">
-      <!-- button A -->
-      <button v-on:click="callFun">A</button>
-      <!-- button B -->
-      <button v-on:click="callFun">B</button>
+    <!-- root element, id set 'app' -->
+    <div id = "app">
+      <!-- Parent's contnet -->
+      Parent Msg : {{text}}
       <br>
-      <!-- text information from button A or button B -->
-      <child>{{msg}}</child>
+      <!-- Click button to call child function-->
+      <button @click="change">Change</button>
       <br>
-      <!-- Use component to set message -->
-      <my-child :msg="msg"></my-child>
+      <!-- Declare child component and set v-ref tag -->
+      Child Msg : <child v-ref:child></child>
     </div>
-    <!-- Load vueJs library -->
-    <script src="./js/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/vue/1.0.26/vue.min.js"></script>
   </body>
   <script>
-    //宣告並設定組件模板內容
-    Vue.component('my-child', {
-      //接收的資訊
-      props: ['msg'],
-      //模板內容
-      template: "<input type='text' value='Msg: ({{ msg }})'>"
-    });
-    //宣告Vue實例
-    var vm = new Vue({
-      //指定該元素的id
-      el: '#app',
-      //指定資料
-      data: { msg : ''},
-      //指定方法
+    /* 
+       Declare component for child.
+       Include third part: 
+       1. element's tag.
+       2. data's callback function.
+       3. methods's function.
+    */
+    Vue.component('child', {
+      template: '<span>{{msg}}</span>',
+      data: function () {
+        return {
+          msg: 'not updated'
+        }
+      },
       methods: {
-        //按下按鈕會執行該函式
-        callFun : function() {
-          //利用"event"獲取該按鈕的內部參數
-          this.msg = "Hello " + event.target.innerText + " !!";
-        }//end of callFun()
+        updateMessage: function () {
+          this.msg = 'updated';
+          console.log(this.$el.textContent);// => 'not updated'
+          this.$nextTick(function () {
+            console.log(this.$el.textContent);// => 'updated'
+          })
+        }
       }
-    });
+    });//End of Vuecomponent().
+    //Declare parent Vue instance.
+    var parent = new Vue({
+      el: '#app',//element id
+      data: {
+        text: '123'
+      },
+      methods : {
+        change : function() {
+          //According to ref index call child's function. 
+          parent.$refs.child.updateMessage();
+        }
+      }
+    });//End of Vue().
   </script>
 </html>
